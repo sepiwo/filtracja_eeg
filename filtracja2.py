@@ -42,12 +42,16 @@ class freq_filter:
 
 
 
+def replace_nan(dane):
+        dane[isnan(dane)]=0
+        return dane
+
+
 
 class eeg_data :
 
-
     def __init__(self,data_file,info_file): #tworzenie obiektu przechowujacego sygnaly oraz informacje o nim
-        self.raw_signal=pandas.read_csv(data_file)  #surowy sygnal
+        self.raw_signal=replace_nan(pandas.read_csv(data_file))  #surowy sygnal
         self.event=pandas.read_csv(info_file).ix[:,3] #wektor zawierajacy informacje o zdarzeniach w czasie trwania sygnalu
         self.start_time=pandas.read_csv(info_file).ix[:,1]  #wektor zawierajacy czas poczatkowy
         self.end_time=pandas.read_csv(info_file).ix[:,2]  #wektor zawierajacy czas koncowy
@@ -75,7 +79,7 @@ class eeg_data :
         plt.figure(1)
         plt.subplot(2,1,1)
         plt.hold(True)
-        pow = plt.plot((self.filter_parameters.sample_rate*0.5/pi)*w, abs(h),'b-', label = 'Char. amplitudowa')
+        powa = plt.plot((self.filter_parameters.sample_rate*0.5/pi)*w, abs(h),'b-', label = 'Char. amplitudowa')
         plt.title('Charakterystyki filtru')
         plt.xlabel('Czestotliwosc [Hz]')
         plt.ylabel('Amplituda')
@@ -83,11 +87,11 @@ class eeg_data :
 
         plt.twinx(ax=None)
         angles = unwrap(angle(h))
-        plt.aznie = plot((self.filter_parameters.sample_rate*0.5/pi)*w,angles, 'g-', label = 'Char. fazowa')
+        plt.znie = plot((self.filter_parameters.sample_rate*0.5/pi)*w,angles, 'g-', label = 'Char. fazowa')
         plt.ylabel('Faza')
 
         plt.grid()
-        tekst = pow + aznie
+        tekst = powa + znie
         wybierz = [l.get_label() for l in tekst]
 
         plt.legend(tekst, wybierz, loc='best')
@@ -112,7 +116,7 @@ class eeg_data :
 data=eeg_data(data_file,info_file)
 
 data.description()
-
+unique(isfinite(data.raw_signal))
 
 
 
@@ -199,8 +203,6 @@ char_plot(num5, denom5, sample_rate)
 przefiltrowany=data.perform_filtration()
 plt.plot(przefiltrowany)
 plt.show()
-przefiltrowany ### NO TU MAMY BLAD!!!!!
 
-przefiltrowany
 
 subplot(1,1,1)
