@@ -38,6 +38,25 @@ class freq_filter:
         self.num, self.denom = iirfilter(5, [self.filter_parameters.lowcut, self.filter_parameters.highcut],btype='bandpass', analog=False, ftype='bessel', output='ba')
 
 
+def pair(data, labels=None):
+    """ Generate something similar to R `pair` """
+
+    nVariables = data.shape[1]
+    if labels is None:
+        labels = ['var%d'%i for i in range(nVariables)]
+    fig = plt.figure()
+    for i in range(nVariables):
+        for j in range(nVariables):
+            nSub = i * nVariables + j + 1
+            ax = fig.add_subplot(nVariables, nVariables, nSub)
+            if i == j:
+                ax.hist(data[:, i])
+                ax.set_title(labels[i])
+            else:
+                ax.plot(data[:, i], data[:, j], '.k')
+
+    return fig
+
 
 
 def replace_nan(dane):
@@ -45,10 +64,12 @@ def replace_nan(dane):
         return dane
 
 def signal_energy(przefiltrowany,window_size):
-    energy= square(przefiltrowany)
+    przefiltrowany=square(przefiltrowany)
+    energy= przefiltrowany
+    
     for i in range(0,energy.shape[0]-1):
         for j in range(0,(energy.shape[1]-window_size-1)):
-            energy[i,j]=mean(energy[i,j:(j+window_size)])
+            energy[i,j+window_size-1]=mean(przefiltrowany[i,j:(j+window_size)])
     return energy
 
 
@@ -169,3 +190,20 @@ show()
 
 #przefiltrowany
 #data.raw_signal[:,1]
+
+# obiekty opisane przez 5 cech (energie dla 5-ciu kanalow)
+dane_5cech = zeros((len(energy[:, 3]), 5))
+dane_5cech[:, 0] = energy[:, 0]  # pamietajac ze Python liczy od zera (wiec nr kanalu to + 1)
+dane_5cech[:, 1] = energy[:, 7]
+dane_5cech[:, 2] = energy[:, 9]
+dane_5cech[:, 3] = energy[:, 11]
+dane_5cech[:, 4] = energy[:, 19]
+etykiety = ["kanal 1", "kanal 8", "kanal 10", "kanal 12", "kanal 20"]
+pair(dane_5cech, etykiety)
+plt.show()
+
+# przefiltrowany.shape
+
+# przefiltrowany
+# data.raw_signal[:,1]
+
