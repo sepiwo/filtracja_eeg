@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas
 from numpy import *
-from scipy.signal import iirdesign, freqz, iirfilter, lfilter
-from scipy.signal import freqz, group_delay
-from matplotlib.pyplot import *
+from scipy.signal import iirdesign, freqz, iirfilter, lfilter, group_delay
+
 
 #data_file="D:/STUDIA/Projekty/EEG/Projekt EEG/skrypty/csv/BCICIV_2a_gdf/A01T_signal.csv"
 #info_file="D:/STUDIA/Projekty/EEG/Projekt EEG/skrypty/csv/BCICIV_2a_gdf/A01T_info.csv"
@@ -184,7 +183,7 @@ energy=signal_energy(przefiltrowany,50)
 plt.plot(energy[:,1])
 
 
-show()
+plt.show()
 
 #przefiltrowany.shape
 
