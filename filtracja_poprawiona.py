@@ -174,9 +174,15 @@ plt.show()
 
 #### Energia
 
+<<<<<<< HEAD
 energy = signal_energy(przefiltrowany, 50)
 plt.plot(energy[:, 0])
 plt.show()
+=======
+plt.show()
+
+#przefiltrowany.shape
+>>>>>>> b3028e7144abd0b4fde28ca7dbfe7c8e72550bc0
 
 
 # obiekty opisane przez 5 cech (energie dla 5-ciu kanalow)
