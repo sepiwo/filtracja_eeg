@@ -22,7 +22,7 @@ class filter_parameters:  # parametry filtru
         self.mloss = 5
         self.matten = 20
         self.type = "bessel"
-
+        self.car= True
 
 class freq_filter:
 
@@ -46,9 +46,17 @@ def signal_energy(przefiltrowany, window_size):
 
     for i in range(0, energy.shape[0]-1):
         for j in range(0, (energy.shape[1]-window_size-1)):
-            energy[i, j] = mean(energy[i, j:(j+window_size)])
+            energy[i, j] = var(energy[i, j:(j+window_size)])
 
     return energy
+
+def car(signal):
+    processed=signal
+    sredni=sum(signal,1)/signal.shape[1] #zsumowanie wszystkich kanalow dla kazdej chwili czasowej 
+    for i in range(0,signal.shape[1]-1):
+        processed.ix[:,i]=signal.ix[:,i]-sredni[i]
+        
+    return processed
 
 
 class eeg_data:
@@ -69,6 +77,7 @@ class eeg_data:
         self.freq_filter = freq_filter()
         self.energy = self.raw_signal
 
+
     def description(self):  # wyswietlanie informacji o sygnalach
         print('Signal inormations:\n channels: ', self.raw_signal.shape[1], '\n signal length:', self.raw_signal.shape[0], '\n classes: ', pandas.unique(self.event))
 
@@ -81,10 +90,19 @@ class eeg_data:
 
     def perform_filtration(self):  # filtracja sygnalu!
         processed = empty([self.raw_signal.shape[0], self.raw_signal.shape[1]])
-        for i in range(0, (self.raw_signal.shape[1]-1)):
-            processed[:, i] = lfilter(self.freq_filter.num, self.freq_filter.denom, self.raw_signal.ix[:, 1])
-        return processed
 
+        if self.freq_filter.filter_parameters.car == True:
+            przefiltrowany_przestrzennie=car(self.raw_signal)
+
+            for i in range(0, (self.raw_signal.shape[1]-1)):
+                processed[:, i] = lfilter(self.freq_filter.num, self.freq_filter.denom, przefiltrowany_przestrzennie.ix[:, 1])
+        else: 
+            for i in range(0, (self.raw_signal.shape[1]-1)):
+                processed[:, i] = lfilter(self.freq_filter.num, self.freq_filter.denom, self.raw_signal.ix[:, 1])
+        #return processed
+        self.filtrated=processed
+
+    
     def plot_filter_characteristics(self):
         w, h = freqz(self.freq_filter.num, self.freq_filter.denom)
         plt.figure(1)
@@ -163,9 +181,12 @@ plt.show()
 
 
                                 ################   FILTROWANIE     ################
-przefiltrowany = data.perform_filtration()
+#przefiltrowany = data.perform_filtration() terraz sygnal przefiltrowany jest w klasie data_eeg.filtrated
 
-plt.plot(przefiltrowany[:, 1], 'g-', label='Sygnal przefiltrowany')
+#Wyłaczenie CAR odkomentowac linijke nizej
+# data.freq_filter.filter_parameters.car=False
+
+plt.plot(data.filtrated[:, 1], 'g-', label='Sygnal przefiltrowany')
 plt.title('Sygnal przefiltrowany')
 plt.xlabel('Numer probki')
 plt.ylabel('Amplituda sygnalu EEG')
@@ -174,15 +195,9 @@ plt.show()
 
 #### Energia
 
-<<<<<<< HEAD
-energy = signal_energy(przefiltrowany, 50)
+energy = signal_energy(data.filtrated, 50)
 plt.plot(energy[:, 0])
 plt.show()
-=======
-plt.show()
-
-#przefiltrowany.shape
->>>>>>> b3028e7144abd0b4fde28ca7dbfe7c8e72550bc0
 
 
 # obiekty opisane przez 5 cech (energie dla 5-ciu kanalow)
@@ -196,7 +211,3 @@ etykiety = ["kanal 1", "kanal 8", "kanal 10", "kanal 12", "kanal 20"]
 pair(dane_5cech, etykiety)
 plt.show()
 
-# przefiltrowany.shape
-
-# przefiltrowany
-# data.raw_signal[:,1]
