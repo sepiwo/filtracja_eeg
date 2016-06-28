@@ -46,7 +46,7 @@ def signal_energy(przefiltrowany, window_size):
 
     for i in range(0, energy.shape[0]-1):
         for j in range(0, (energy.shape[1]-window_size-1)):
-            energy[i, j] = var(energy[i, j:(j+window_size)])
+            energy[i, j] = log(var(energy[i, j:(j+window_size)]))
 
     return energy
 
