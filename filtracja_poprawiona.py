@@ -76,7 +76,7 @@ class eeg_data:
         self.filter_parameters = filter_parameters()
         self.freq_filter = freq_filter()
         self.energy = self.raw_signal
-
+        self.filtrated=empty((self.raw_signal.shape[0],self.raw_signal.shape[1]))
 
     def description(self):  # wyswietlanie informacji o sygnalach
         print('Signal inormations:\n channels: ', self.raw_signal.shape[1], '\n signal length:', self.raw_signal.shape[0], '\n classes: ', pandas.unique(self.event))
@@ -185,7 +185,7 @@ plt.show()
 
 #Wyłaczenie CAR odkomentowac linijke nizej
 # data.freq_filter.filter_parameters.car=False
-
+data.perform_filtration()
 plt.plot(data.filtrated[:, 1], 'g-', label='Sygnal przefiltrowany')
 plt.title('Sygnal przefiltrowany')
 plt.xlabel('Numer probki')
